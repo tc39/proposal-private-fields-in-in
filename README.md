@@ -1,34 +1,65 @@
-# template-for-proposals
+# Ergonomic brand checks for Private Fields
 
-A repository template for ECMAScript proposals.
+EcmaScript Proposal, specs, and reference implementation to provide brand checks without exceptions.
 
-## Before creating a proposal
+Spec drafted by [@ljharb](https://github.com/ljharb).
 
-Please ensure the following:
-  1. You have read the [process document](https://tc39.github.io/process-document/)
-  1. You have reviewed the [existing proposals](https://github.com/tc39/proposals/)
-  1. You are aware that your proposal requires being a member of TC39, or locating a TC39 member to "champion" your proposal
+Built on top of https://github.com/tc39/ecma262/pull/1668/ pending Class Fields being stage 4 and merged into the larger spec.
 
-## Create your proposal repo
+This proposal is currently at stage 0 of the [process](https://tc39.github.io/process-document/).
 
-Follow these steps:
-  1.  Create your own repo, clone this one, and copy its contents into your repo. (Note: Do not fork this repo in GitHub's web interface, as that will later prevent transfer into the TC39 organization)
-  1.  Go to your repo settings “Options” page, under “GitHub Pages”, and set the source to the **master branch** and click Save.
-      1. Ensure "Issues" is checked.
-      1. Also, you probably want to disable "Wiki" and "Projects"
-  1.  Avoid merge conflicts with build process output files by running:
-      ```sh
-      git config --local --add merge.output.driver true
-      git config --local --add merge.output.driver true
-      ```
-  1.  Add a post-rewrite git hook to auto-rebuild the output on every commit:
-      ```sh
-      cp hooks/post-rewrite .git/hooks/post-rewrite
-      chmod +x .git/hooks/post-rewrite
-      ```
+## Rationale
+Private fields have a built-in ”brand check”, in that if you try to access a private field on an object that does not have it installed, it throws an exception.
 
-## Maintain your proposal repo
+This is great! However, in order to keep the existence of a private field actually private, I often want to check _if_ an object has a private field, and if not, have some fallback behavior (which might even be throwing a custom exception, with a message that does not reveal that I’m using a private field as my mechanism).
 
-  1. Make your changes to `spec.emu` (ecmarkup uses HTML syntax, but is not HTML, so I strongly suggest not naming it ".html")
-  1. Any commit that makes meaningful changes to the spec, should run `npm run build` and commit the resulting output.
-  1. Whenever you update `ecmarkup`, run `npm run build` and commit any changes that come from that dependency.
+Using `try`/`catch` for this does work, but is quite awkward:
+```js
+class C {
+  #brand;
+
+  static isC(obj) {
+    try {
+      obj.#brand;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+```
+
+What is desired is a simple solution to produce a boolean that does not require a `try`/`catch` or exceptions.
+
+## Possible Solutions:
+
+### `in`
+The most obvious solution seems to be using the `in` keyword, like so:
+```js
+class C {
+  #brand;
+
+  static isC(obj) {
+    return #brand in obj;
+  }
+}
+```
+
+This has no ASI hazards I am aware of; however, it does have one important tradeoff: it permanently kills any possibility for private field shorthand. Specifically, this is because if `#brand` (in the previous example) is a shorthand for `this.#brand`, then `(#brand) in obj` would have to mean the same as `this.#brand in obj`, which means "is the _value_ of `this.#brand` in `obj`?", not "does `obj` have the private field `#brand`?".
+
+### `try` statement
+
+Another alternative is:
+```js
+class C {
+  #brand;
+
+  static isC(obj) {
+    return try obj.#brand;
+  }
+}
+```
+
+However, this strongly suggests that `try <expression>` would be a generic syntax for "if it throws an exception, produce `false`, otherwise produce `true`". That would be a much larger proposal, and would perhaps be a bit overkill to solve the specific problem around private fields.
+
+This would require a lookahead restriction for a curly brace (which would mean that the try expression couldn't be an object literal, unless it was wrapped in parens).
