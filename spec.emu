@@ -4,20 +4,50 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
 <script src="./spec.js"></script>
 <pre class="metadata">
-title: Proposal Title Goes Here
-stage: -1
-contributors: Your Name Goes Here
+title: Private Fields in `in`
+stage: 0
+contributors: Jordan Harband
 </pre>
 
-<emu-clause id="sec-demo-clause">
-  <h1>This is an emu-clause</h1>
-  <p>This is an algorithm:</p>
-  <emu-alg>
-    1. Let _proposal_ be *undefined*.
-    1. If IsAccepted(_proposal_),
-      1. Let _stage_ be *0*.
-    1. Else,
-      1. Let _stage_ be *-1*.
-    1. Return ? ToString(_proposal_).
-  </emu-alg>
+<emu-clause id="sec-ecmascript-language-expressions">
+  <h1>ECMAScript Language: Expressions</h1>
+  <emu-clause id="sec-relational-operators">
+    <h1><a href="https://tc39.es/ecma262/#sec-relational-operators">Relational Operators</a></h1>
+    <emu-note>
+      <p>The result of evaluating a relational operator is always of type Boolean, reflecting whether the relationship named by the operator holds between its two operands.</p>
+    </emu-note>
+    <h2>Syntax</h2>
+    <emu-grammar type="definition">
+      RelationalExpression[In, Yield, Await] :
+        ShiftExpression[?Yield, ?Await]
+        RelationalExpression[?In, ?Yield, ?Await] `&lt;` ShiftExpression[?Yield, ?Await]
+        RelationalExpression[?In, ?Yield, ?Await] `&gt;` ShiftExpression[?Yield, ?Await]
+        RelationalExpression[?In, ?Yield, ?Await] `&lt;=` ShiftExpression[?Yield, ?Await]
+        RelationalExpression[?In, ?Yield, ?Await] `&gt;=` ShiftExpression[?Yield, ?Await]
+        RelationalExpression[?In, ?Yield, ?Await] `instanceof` ShiftExpression[?Yield, ?Await]
+        [+In] RelationalExpression[+In, ?Yield, ?Await] `in` ShiftExpression[?Yield, ?Await]
+        <ins>[+In] PrivateIdentifier[+In] `in` ShiftExpression[?Yield, ?Await]</ins>
+    </emu-grammar>
+    <emu-note>
+      <p>The <sub>[In]</sub> grammar parameter is needed to avoid confusing the `in` operator in a relational expression with the `in` operator in a `for` statement.</p>
+    </emu-note>
+    ...
+    <emu-clause id="sec-relational-operators-runtime-semantics-evaluation">
+      <h1><a href="https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation">Runtime Semantics: Evaluation</a></h1>
+      <emu-grammar><ins>RelationalExpression : PrivateIdentifier `in` ShiftExpression</ins></emu-grammar>
+      <emu-alg>
+        1. <ins>Let _privateIdentifier_ be the StringValue of |PrivateIdentifier|.</ins>
+        1. <ins>Let _rref_ be the result of evaluating |ShiftExpression|.</ins>
+        1. <ins>Let _rval_ be ? GetValue(_rref_).</ins>
+        1. <ins>If Type(_rval_) is not Object, throw a *TypeError* exception.</ins>
+        1. <ins>Let _env_ be the running execution context's PrivateEnvironment.</ins>
+        1. <ins>Let _privateNameBinding_ be ? ResolveBinding(_privateIdentifier_, _env_).</ins>
+        1. <ins>Let _privateName_ be ? GetValue(_privateNameBinding_).</ins>
+        1. <ins>Assert: _privateName_ is a Private Name.</ins>
+        1. <ins>If ! PrivateFieldFind(_privateName_, _rval_) is not ~empty~, then</ins>
+          1. <ins>Return *true*.</ins>
+        1. <ins>Return *false*.</ins>
+      </emu-alg>
+    </emu-clause>
+  </emu-clause>
 </emu-clause>

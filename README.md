@@ -63,3 +63,6 @@ class C {
 However, this strongly suggests that `try <expression>` would be a generic syntax for "if it throws an exception, produce `false`, otherwise produce `true`". That would be a much larger proposal, and would perhaps be a bit overkill to solve the specific problem around private fields.
 
 This would require a lookahead restriction for a curly brace (which would mean that the try expression couldn't be an object literal, unless it was wrapped in parens).
+
+## Spec
+You can view the spec for the `in` solution rendered as [HTML](http://ljharb.github.io/proposal-private-fields-in-in/).
