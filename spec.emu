@@ -26,7 +26,7 @@ contributors: Jordan Harband
         RelationalExpression[?In, ?Yield, ?Await] `&gt;=` ShiftExpression[?Yield, ?Await]
         RelationalExpression[?In, ?Yield, ?Await] `instanceof` ShiftExpression[?Yield, ?Await]
         [+In] RelationalExpression[+In, ?Yield, ?Await] `in` ShiftExpression[?Yield, ?Await]
-        <ins>[+In] PrivateIdentifier[+In] `in` ShiftExpression[?Yield, ?Await]</ins>
+        <ins>[+In] PrivateIdentifier `in` ShiftExpression[?Yield, ?Await]</ins>
     </emu-grammar>
     <emu-note>
       <p>The <sub>[In]</sub> grammar parameter is needed to avoid confusing the `in` operator in a relational expression with the `in` operator in a `for` statement.</p>
