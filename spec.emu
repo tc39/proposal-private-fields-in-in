@@ -5,7 +5,7 @@
 <script src="./spec.js"></script>
 <pre class="metadata">
 title: Private Fields in `in`
-stage: 0
+stage: 1
 contributors: Jordan Harband
 </pre>
 
