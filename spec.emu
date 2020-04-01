@@ -46,6 +46,8 @@ contributors: Jordan Harband
         1. <ins>Assert: _privateName_ is a Private Name.</ins>
         1. <ins>If ! PrivateFieldFind(_privateName_, _rval_) is not ~empty~, then</ins>
           1. <ins>Return *true*.</ins>
+        1. <ins>If PrivateBrandCheck(_rval_, _privateName_) is not an abrupt completion, then</ins>
+          1. <ins>Return *true*.</ins>
         1. <ins>Return *false*.</ins>
       </emu-alg>
     </emu-clause>
