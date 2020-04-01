@@ -29,7 +29,30 @@ class C {
 }
 ```
 
-What is desired is a simple solution to produce a boolean that does not require a `try`/`catch` or exceptions.
+This is also an issue for getters (that might throw):
+```js
+class C {
+  #data = null; // populated later
+
+  get #getter() {
+    if (!this.#data) {
+      throw new Error('no data yet!');
+    }
+    return this.#data;
+  }
+
+  static isC(obj) {
+    try {
+      obj.#getter;
+      return true;
+    } catch {
+      return false; // oops! might have gotten here because `#getter` threw :-(
+    }
+  }
+}
+```
+
+What is desired is a simple solution to produce a boolean indicating the presence of a private field, that does not require a `try`/`catch` or exceptions.
 
 ## Possible Solutions:
 
@@ -39,8 +62,12 @@ The most obvious solution seems to be using the `in` keyword, like so:
 class C {
   #brand;
 
+  #method() {}
+
+  get #getter() {}
+
   static isC(obj) {
-    return #brand in obj;
+    return #brand in obj && #method in obj && #getter in obj;
   }
 }
 ```
