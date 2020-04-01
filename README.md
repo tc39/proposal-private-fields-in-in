@@ -92,4 +92,4 @@ However, this strongly suggests that `try <expression>` would be a generic synta
 This would require a lookahead restriction for a curly brace (which would mean that the try expression couldn't be an object literal, unless it was wrapped in parens).
 
 ## Spec
-You can view the spec for the `in` solution rendered as [HTML](http://ljharb.github.io/proposal-private-fields-in-in/).
+You can view the spec for the `in` solution rendered as [HTML](http://tc39.es/proposal-private-fields-in-in/).
