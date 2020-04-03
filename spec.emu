@@ -44,10 +44,13 @@ contributors: Jordan Harband
         1. <ins>Let _privateNameBinding_ be ? ResolveBinding(_privateIdentifier_, _env_).</ins>
         1. <ins>Let _privateName_ be ? GetValue(_privateNameBinding_).</ins>
         1. <ins>Assert: _privateName_ is a Private Name.</ins>
-        1. <ins>If ! PrivateFieldFind(_privateName_, _rval_) is not ~empty~, then</ins>
-          1. <ins>Return *true*.</ins>
-        1. <ins>If PrivateBrandCheck(_rval_, _privateName_) is not an abrupt completion, then</ins>
-          1. <ins>Return *true*.</ins>
+        1. <ins>If _P_.[[Kind]] is *"field"*,</ins>
+          1. <ins>If ! PrivateFieldFind(_privateName_, _rval_) is not ~empty~, then</ins>
+            1. <ins>Return *true*.</ins>
+        1. <ins>Else,</ins>
+          1. <ins>Assert: _P_.[[Kind]] is *"method"* or *"accessor"*.</ins>
+          1. <ins>If PrivateBrandCheck(_rval_, _privateName_) is not an abrupt completion, then</ins>
+            1. <ins>Return *true*.</ins>
         1. <ins>Return *false*.</ins>
       </emu-alg>
     </emu-clause>
