@@ -32,26 +32,6 @@ contributors: Jordan Harband
       <p>The <sub>[In]</sub> grammar parameter is needed to avoid confusing the `in` operator in a relational expression with the `in` operator in a `for` statement.</p>
     </emu-note>
     ...
-    <emu-clause id="sec-identifier-names-static-semantics-early-errors">
-      <h1>Static Semantics: Early Errors</h1>
-      ...
-      <emu-grammar>ClassElementName : PrivateIdentifier `;`</emu-grammar>
-      <ul>
-        <li>
-          It is a Syntax Error if StringValue of |PrivateIdentifier| is `"#constructor"`.
-        </li>
-      </ul>
-
-      <ins class="block">
-        <emu-grammar><ins>PrivateIdentifier `in` ShiftExpression[?Yield, ?Await]</ins></emu-grammar>
-        <ul>
-          <li>
-            It is a Syntax Error if StringValue of |PrivateIdentifier| is `"#constructor"`.
-          </li>
-        </ul>
-      </ins>
-    </emu-clause>
-    ...
     <emu-clause id="sec-relational-operators-runtime-semantics-evaluation">
       <h1><a href="https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation">Runtime Semantics: Evaluation</a></h1>
       <ins class="block">
@@ -76,5 +56,17 @@ contributors: Jordan Harband
         </emu-alg>
       </ins>
     </emu-clause>
+  </emu-clause>
+
+  <emu-clause id="sec-all-private-identifiers-valid">
+    <h1><a href="https://tc39.es/proposal-class-fields/#sec-all-private-identifiers-valid">Static Semantics: AllPrivateIdentifiersValid</a></h1>
+    AllPrivateIdentifiersValid is an abstract operation which takes _names_ as an argument.
+    <ins class="block">
+      <emu-grammar>RelationalExpression : PrivateIdentifier `in` ShiftExpression</emu-grammar>
+      <emu-alg>
+        1. If StringValue of |PrivateIdentifier| is in _names_, return *true*.
+        1. Return *false*.
+      </emu-alg>
+    </ins>
   </emu-clause>
 </emu-clause>
