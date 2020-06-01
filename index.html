@@ -10,14 +10,14 @@ function Search(menu) {
   this.$search = document.getElementById('menu-search');
   this.$searchBox = document.getElementById('menu-search-box');
   this.$searchResults = document.getElementById('menu-search-results');
-  
+
   this.loadBiblio();
-  
+
   document.addEventListener('keydown', this.documentKeydown.bind(this));
-  
+
   this.$searchBox.addEventListener('keydown', debounce(this.searchBoxKeydown.bind(this), { stopPropagation: true }));
   this.$searchBox.addEventListener('keyup', debounce(this.searchBoxKeyup.bind(this), { stopPropagation: true }));
-  
+
   // Perform an initial search if the box is not empty.
   if (this.$searchBox.value) {
     this.search(this.$searchBox.value);
@@ -61,7 +61,7 @@ Search.prototype.searchBoxKeyup = function (e) {
   if (e.keyCode === 13 || e.keyCode === 9) {
     return;
   }
-  
+
   this.search(e.target.value);
 }
 
@@ -84,25 +84,23 @@ Search.prototype.triggerSearch = function (e) {
 // prefer shorter matches.
 function relevance(result, searchString) {
   var relevance = 0;
-  
+
   relevance = Math.max(0, 8 - result.match.chunks) << 7;
-  
+
   if (result.match.caseMatch) {
     relevance *= 2;
   }
-  
+
   if (result.match.prefix) {
     relevance += 2048
   }
-  
+
   relevance += Math.max(0, 255 - result.entry.key.length);
-  
+
   return relevance;
 }
 
 Search.prototype.search = function (searchString) {
-  var s = Date.now();
-
   if (searchString === '') {
     this.displayResults([]);
     this.hideSearch();
@@ -110,12 +108,12 @@ Search.prototype.search = function (searchString) {
   } else {
     this.showSearch();
   }
-  
+
   if (searchString.length === 1) {
     this.displayResults([]);
     return;
   }
-    
+
   var results;
 
   if (/^[\d\.]*$/.test(searchString)) {
@@ -126,7 +124,7 @@ Search.prototype.search = function (searchString) {
     });
   } else {
     results = [];
-    
+
     for (var i = 0; i < this.biblio.length; i++) {
       var entry = this.biblio[i];
       if (!entry.key) {
@@ -139,11 +137,11 @@ Search.prototype.search = function (searchString) {
         results.push({ entry: entry, match: match });
       }
     }
-  
+
     results.forEach(function (result) {
       result.relevance = relevance(result, searchString);
     });
-    
+
     results = results.sort(function (a, b) { return b.relevance - a.relevance });
 
   }
@@ -151,7 +149,7 @@ Search.prototype.search = function (searchString) {
   if (results.length > 50) {
     results = results.slice(0, 50);
   }
-  
+
   this.displayResults(results);
 }
 Search.prototype.hideSearch = function () {
@@ -168,7 +166,7 @@ Search.prototype.selectResult = function () {
   if ($first) {
     document.location = $first.getAttribute('href');
   }
-  
+
   this.$searchBox.value = '';
   this.$searchBox.blur();
   this.displayResults([]);
@@ -182,7 +180,7 @@ Search.prototype.selectResult = function () {
 Search.prototype.displayResults = function (results) {
   if (results.length > 0) {
     this.$searchResults.classList.remove('no-results');
-    
+
     var html = '<ul>';
 
     results.forEach(function (result) {
@@ -199,7 +197,7 @@ Search.prototype.displayResults = function (results) {
       } else if (entry.type === 'production') {
         text = entry.key;
         cssClass = 'prod';
-        id = entry.id;  
+        id = entry.id;
       } else if (entry.type === 'op') {
         text = entry.key;
         cssClass = 'op';
@@ -211,7 +209,7 @@ Search.prototype.displayResults = function (results) {
       }
 
       if (text) {
-        html += '<li class=menu-search-result-' + cssClass + '><a href="#' + id + '">' + text + '</a></li>'
+        html += '<li class=menu-search-result-' + cssClass + '><a href="#' + id + '">' + text + '</a></li>';
       }
     });
 
@@ -234,7 +232,7 @@ function Menu() {
   this.$toc = document.querySelector('#menu-toc > ol');
   this.$specContainer = document.getElementById('spec-container');
   this.search = new Search(this);
-  
+
   this._pinnedIds = {}; 
   this.loadPinEntries();
 
@@ -279,9 +277,9 @@ function Menu() {
                     && target.offsetHeight + target.scrollTop >= target.scrollHeight;
 
     if (offBottom) {
-		  e.preventDefault();
-	  }
-  })
+      e.preventDefault();
+    }
+  });
 }
 
 Menu.prototype.documentKeydown = function (e) {
@@ -308,7 +306,7 @@ Menu.prototype.revealInToc = function (path) {
     current[i].classList.remove('revealed');
     current[i].classList.remove('revealed-leaf');
   }
-  
+
   var current = this.$toc;
   var index = 0;
   while (index < path.length) {
@@ -319,7 +317,7 @@ Menu.prototype.revealInToc = function (path) {
         if (index === path.length - 1) {
           children[i].classList.add('revealed-leaf');
           var rect = children[i].getBoundingClientRect();
-          this.$toc.getBoundingClientRect().top
+          // this.$toc.getBoundingClientRect().top;
           var tocRect = this.$toc.getBoundingClientRect();
           if (rect.top + 10 > tocRect.bottom) {
             this.$toc.scrollTop = this.$toc.scrollTop + (rect.top - tocRect.bottom) + (rect.bottom - rect.top);
@@ -330,29 +328,27 @@ Menu.prototype.revealInToc = function (path) {
         current = children[i].querySelector('ol');
         index++;
         break;
-      }      
+      }
     }
-    
+
   }
 }
 
 function findActiveClause(root, path) {
   var clauses = new ClauseWalker(root);
   var $clause;
-  var found = false;
   var path = path || [];
-  
+
   while ($clause = clauses.nextNode()) {
     var rect = $clause.getBoundingClientRect();
-    var $header = $clause.children[0];
+    var $header = $clause.querySelector("h1");
     var marginTop = parseInt(getComputedStyle($header)["margin-top"]);
-    
+
     if ((rect.top - marginTop) <= 0 && rect.bottom > 0) {
-      found = true;
       return findActiveClause($clause, path.concat($clause)) || path;
     }
   }
-  
+
   return path;
 }
 
@@ -377,7 +373,7 @@ function ClauseWalker(root) {
     },
     false
     );
-  
+
   return treeWalker;
 }
 
@@ -460,7 +456,7 @@ Menu.prototype.loadPinEntries = function () {
   } catch (e) {
     return;
   }
-  
+
   var pinsString = window.localStorage.pinEntries;
   if (!pinsString) return;
   var pins = JSON.parse(pinsString);
@@ -595,12 +591,11 @@ function fuzzysearch (searchString, haystack, caseInsensitive) {
   var qlen = searchString.length;
   var chunks = 1;
   var finding = false;
-  var prefix = true;
-  
+
   if (qlen > tlen) {
     return false;
   }
-  
+
   if (qlen === tlen) {
     if (searchString === haystack) {
       return { caseMatch: true, chunks: 1, prefix: true };
@@ -610,7 +605,7 @@ function fuzzysearch (searchString, haystack, caseInsensitive) {
       return false;
     }
   }
-  
+
   outer: for (var i = 0, j = 0; i < qlen; i++) {
     var nch = searchString[i];
     while (j < tlen) {
@@ -624,12 +619,12 @@ function fuzzysearch (searchString, haystack, caseInsensitive) {
         finding = false;
       }
     }
-    
-    if (caseInsensitive) { return false }
-    
+
+    if (caseInsensitive) { return false; }
+
     return fuzzysearch(searchString.toLowerCase(), haystack.toLowerCase(), true);
   }
-  
+
   return { caseMatch: !caseInsensitive, chunks: chunks, prefix: j <= qlen };
 }
 
@@ -786,7 +781,6 @@ var referencePane = {
       var target = document.getElementById(id);
       var cid = findParentClauseId(target);
       var clause = menu.search.biblio.byId[cid];
-      var dupCount = 0;
       return { id: id, clause: clause }
     }).sort(function (a, b) {
       return sortByClauseNumber(a.clause, b.clause);
@@ -826,7 +820,7 @@ function sortByClauseNumber(c1, c2) {
     if (i >= c2c.length) {
       return 1;
     }
-    
+
     var c1 = c1c[i];
     var c2 = c2c[i];
     var c1cn = Number(c1);
@@ -1045,6 +1039,10 @@ emu-note > div.note-contents > p:first-of-type {
 emu-note > div.note-contents > p:last-of-type {
   margin-bottom: 0;
 }
+
+emu-table td code {
+  white-space: normal;
+} 
 
 emu-figure {
   display: block;
@@ -1820,7 +1818,7 @@ li.menu-search-result-term:before {
     display: none; 
   }
 }
-</style></head><body><div id="menu-toggle">☰</div><div id="menu-spacer"></div><div id="menu"><div id="menu-search"><input type="text" id="menu-search-box" placeholder="Search..."><div id="menu-search-results" class="inactive"></div></div><div id="menu-pins"><div class="menu-pane-header">Pins</div><ul id="menu-pins-list"></ul></div><div class="menu-pane-header">Table of Contents</div><div id="menu-toc"><ol class="toc"><li><span class="item-toggle">◢</span><a href="#sec-ecmascript-language-expressions" title="ECMAScript Language: Expressions"><span class="secnum">1</span> ECMAScript Language: Expressions</a><ol class="toc"><li><span class="item-toggle">◢</span><a href="#sec-relational-operators" title="Relational Operators"><span class="secnum">1.1</span> </a><a href="https://tc39.es/ecma262/#sec-relational-operators">Relational Operators</a><ol class="toc"><li><span class="item-toggle-none"></span><a href="#sec-relational-operators-runtime-semantics-evaluation" title="Runtime Semantics: Evaluation"><span class="secnum">1.1.1</span> </a><a href="https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation">RS: Evaluation</a></li></ol></li><li><span class="item-toggle-none"></span><a href="#sec-all-private-identifiers-valid" title="Static Semantics: AllPrivateIdentifiersValid"><span class="secnum">1.2</span> </a><a href="https://tc39.es/proposal-class-fields/#sec-all-private-identifiers-valid">SS: AllPrivateIdentifiersValid</a></li></ol></li><li><span class="item-toggle-none"></span><a href="#sec-copyright-and-software-license" title="Copyright &amp; Software License"><span class="secnum">A</span> Copyright &amp; Software License</a></li></ol></div></div><div id="spec-container"><h1 class="version first">Stage 1 Draft / April 8, 2020</h1><h1 class="title">Private Fields in <code>in</code></h1>
+</style></head><body><div id="menu-toggle">☰</div><div id="menu-spacer"></div><div id="menu"><div id="menu-search"><input type="text" id="menu-search-box" placeholder="Search..."><div id="menu-search-results" class="inactive"></div></div><div id="menu-pins"><div class="menu-pane-header">Pins</div><ul id="menu-pins-list"></ul></div><div class="menu-pane-header">Table of Contents</div><div id="menu-toc"><ol class="toc"><li><span class="item-toggle">◢</span><a href="#sec-ecmascript-language-expressions" title="ECMAScript Language: Expressions"><span class="secnum">1</span> ECMAScript Language: Expressions</a><ol class="toc"><li><span class="item-toggle">◢</span><a href="#sec-relational-operators" title="Relational Operators"><span class="secnum">1.1</span> </a><a href="https://tc39.es/ecma262/#sec-relational-operators">Relational Operators</a><ol class="toc"><li><span class="item-toggle-none"></span><a href="#sec-relational-operators-runtime-semantics-evaluation" title="Runtime Semantics: Evaluation"><span class="secnum">1.1.1</span> </a><a href="https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation">RS: Evaluation</a></li></ol></li><li><span class="item-toggle-none"></span><a href="#sec-all-private-identifiers-valid" title="Static Semantics: AllPrivateIdentifiersValid"><span class="secnum">1.2</span> </a><a href="https://tc39.es/proposal-class-fields/#sec-all-private-identifiers-valid">SS: AllPrivateIdentifiersValid</a></li></ol></li><li><span class="item-toggle-none"></span><a href="#sec-copyright-and-software-license" title="Copyright &amp; Software License"><span class="secnum">A</span> Copyright &amp; Software License</a></li></ol></div></div><div id="spec-container"><h1 class="version first">Stage 2 Draft / June 1, 2020</h1><h1 class="title">Private Fields in <code>in</code></h1>
 
 <emu-clause id="sec-ecmascript-language-expressions">
   <h1><span class="secnum">1</span> ECMAScript Language: Expressions</h1>
@@ -1831,28 +1829,26 @@ li.menu-search-result-term:before {
     </div></emu-note>
     <h2>Syntax</h2>
     <emu-grammar type="definition"><emu-production name="RelationalExpression" params="In, Yield, Await" id="prod-RelationalExpression">
-    <emu-nt params="In, Yield, Await"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[In, Yield, Await]</emu-params></emu-mods></emu-nt><emu-geq>:</emu-geq><emu-rhs a="12fcef98"><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <emu-rhs a="4699dc26"><emu-nt params="?In, ?Yield, ?Await" id="_ref_4"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&lt;</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <emu-rhs a="e2226dd2"><emu-nt params="?In, ?Yield, ?Await" id="_ref_5"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&gt;</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <emu-rhs a="45a2035d"><emu-nt params="?In, ?Yield, ?Await" id="_ref_6"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&lt;=</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <emu-rhs a="b8dbaec1"><emu-nt params="?In, ?Yield, ?Await" id="_ref_7"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&gt;=</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <emu-rhs a="8a60d81a"><emu-nt params="?In, ?Yield, ?Await" id="_ref_8"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>instanceof</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <emu-rhs a="b629d07c" constraints="+In"><emu-constraints>[+In]</emu-constraints><emu-nt params="+In, ?Yield, ?Await" id="_ref_9"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[+In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>in</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
-    <ins><emu-rhs a="3e422a01" constraints="+In"><emu-constraints>[+In]</emu-constraints><emu-nt>PrivateIdentifier</emu-nt><emu-t>in</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs></ins>
+    <emu-nt params="In, Yield, Await"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[In, Yield, Await]</emu-params></emu-mods></emu-nt><emu-geq>:</emu-geq><emu-rhs a="12fcef98"><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="4699dc26"><emu-nt params="?In, ?Yield, ?Await" id="_ref_4"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&lt;</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="e2226dd2"><emu-nt params="?In, ?Yield, ?Await" id="_ref_5"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&gt;</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="45a2035d"><emu-nt params="?In, ?Yield, ?Await" id="_ref_6"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&lt;=</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="b8dbaec1"><emu-nt params="?In, ?Yield, ?Await" id="_ref_7"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>&gt;=</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="8a60d81a"><emu-nt params="?In, ?Yield, ?Await" id="_ref_8"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[?In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>instanceof</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <emu-rhs a="b629d07c" constraints="+In"><emu-constraints>[+In]</emu-constraints><emu-nt params="+In, ?Yield, ?Await" id="_ref_9"><a href="#prod-RelationalExpression">RelationalExpression</a><emu-mods><emu-params>[+In, ?Yield, ?Await]</emu-params></emu-mods></emu-nt><emu-t>in</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs>
+    <ins><emu-rhs a="3e422a01" constraints="+In"><emu-constraints>[+In]</emu-constraints><emu-nt>PrivateIdentifier</emu-nt><emu-t>in</emu-t><emu-nt params="?Yield, ?Await"><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a><emu-mods><emu-params>[?Yield, ?Await]</emu-params></emu-mods></emu-nt></emu-rhs></ins>
 </emu-production></emu-grammar>
     <emu-note><span class="note">Note 2</span><div class="note-contents">
-      <p>The  <sub>[In]</sub> grammar parameter is needed to avoid confusing the <code>in</code> operator in a relational expression with the <code>in</code> operator in a <code>for</code> statement.</p>
+      <p>The <sub>[In]</sub> grammar parameter is needed to avoid confusing the <code>in</code> operator in a relational expression with the <code>in</code> operator in a <code>for</code> statement.</p>
     </div></emu-note>
     ...
-    
     <emu-clause id="sec-relational-operators-runtime-semantics-evaluation">
       <h1><span class="secnum">1.1.1</span> <a href="https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation">Runtime Semantics: Evaluation</a></h1>
       <ins class="block">
         <emu-grammar><emu-production name="RelationalExpression" collapsed="">
-    <emu-nt><a href="#prod-RelationalExpression">RelationalExpression</a></emu-nt><emu-geq>:</emu-geq><emu-rhs a="6c591724"><emu-nt>PrivateIdentifier</emu-nt><emu-t>in</emu-t><emu-nt><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a></emu-nt></emu-rhs>
+    <emu-nt><a href="#prod-RelationalExpression">RelationalExpression</a></emu-nt><emu-geq>:</emu-geq><emu-rhs a="6c591724"><emu-nt>PrivateIdentifier</emu-nt><emu-t>in</emu-t><emu-nt><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a></emu-nt></emu-rhs>
 </emu-production></emu-grammar>
-        <emu-alg><ol><li>Let <var>privateIdentifier</var> be the StringValue of <emu-nt>PrivateIdentifier</emu-nt>.</li><li>Let <var>rref</var> be the result of evaluating <emu-nt><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a></emu-nt>.</li><li>Let <var>rval</var> be ?&nbsp;<emu-xref aoid="GetValue" id="_ref_0"><a href="https://tc39.github.io/ecma262/#sec-getvalue">GetValue</a></emu-xref>(<var>rref</var>).</li><li>If <emu-xref aoid="Type" id="_ref_1"><a href="https://tc39.github.io/ecma262/#sec-ecmascript-data-types-and-values">Type</a></emu-xref>(<var>rval</var>) is not Object, throw a <emu-val>TypeError</emu-val> exception.</li><li>Let <var>env</var> be the <emu-xref href="#running-execution-context"><a href="https://tc39.github.io/ecma262/#running-execution-context">running execution context</a></emu-xref>'s PrivateEnvironment.</li><li>Let <var>privateNameBinding</var> be ?&nbsp;<emu-xref aoid="ResolveBinding" id="_ref_2"><a href="https://tc39.github.io/ecma262/#sec-resolvebinding">ResolveBinding</a></emu-xref>(<var>privateIdentifier</var>, <var>env</var>).</li><li>Let <var>privateName</var> be ?&nbsp;<emu-xref aoid="GetValue" id="_ref_3"><a href="https://tc39.github.io/ecma262/#sec-getvalue">GetValue</a></emu-xref>(<var>privateNameBinding</var>).</li><li>Assert: <var>privateName</var> is a Private Name.</li><li>If <var>P</var>.[[Kind]] is <emu-val>"field"</emu-val>,<ol><li>If !&nbsp;PrivateFieldFind(<var>privateName</var>, <var>rval</var>) is not <emu-const>empty</emu-const>, then<ol><li>Return <emu-val>true</emu-val>.</li></ol></li></ol></li><li>Else,<ol><li>Assert: <var>P</var>.[[Kind]] is <emu-val>"method"</emu-val> or <emu-val>"accessor"</emu-val>.</li><li>If PrivateBrandCheck(<var>rval</var>, <var>privateName</var>) is not an <emu-xref href="#sec-completion-record-specification-type"><a href="https://tc39.github.io/ecma262/#sec-completion-record-specification-type">abrupt completion</a></emu-xref>, then<ol><li>Return <emu-val>true</emu-val>.</li></ol></li></ol></li><li>Return <emu-val>false</emu-val>.
-        </li></ol></emu-alg>
+        <emu-alg><ol><li>Let <var>privateIdentifier</var> be the StringValue of <emu-nt>PrivateIdentifier</emu-nt>.</li><li>Let <var>rref</var> be the result of evaluating <emu-nt><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a></emu-nt>.</li><li>Let <var>rval</var> be ?&nbsp;<emu-xref aoid="GetValue" id="_ref_0"><a href="https://tc39.es/ecma262/#sec-getvalue">GetValue</a></emu-xref>(<var>rref</var>).</li><li>If <emu-xref aoid="Type" id="_ref_1"><a href="https://tc39.es/ecma262/#sec-ecmascript-data-types-and-values">Type</a></emu-xref>(<var>rval</var>) is not Object, throw a <emu-val>TypeError</emu-val> exception.</li><li>Let <var>env</var> be the <emu-xref href="#running-execution-context"><a href="https://tc39.es/ecma262/#running-execution-context">running execution context</a></emu-xref>'s PrivateEnvironment.</li><li>Let <var>privateNameBinding</var> be ?&nbsp;<emu-xref aoid="ResolveBinding" id="_ref_2"><a href="https://tc39.es/ecma262/#sec-resolvebinding">ResolveBinding</a></emu-xref>(<var>privateIdentifier</var>, <var>env</var>).</li><li>Let <var>privateName</var> be ?&nbsp;<emu-xref aoid="GetValue" id="_ref_3"><a href="https://tc39.es/ecma262/#sec-getvalue">GetValue</a></emu-xref>(<var>privateNameBinding</var>).</li><li><emu-xref href="#assert"><a href="https://tc39.es/ecma262/#assert">Assert</a></emu-xref>: <var>privateName</var> is a Private Name.</li><li>If <var>P</var>.[[Kind]] is <emu-val>"field"</emu-val>,<ol><li>If !&nbsp;PrivateFieldFind(<var>privateName</var>, <var>rval</var>) is not <emu-const>empty</emu-const>, then<ol><li>Return <emu-val>true</emu-val>.</li></ol></li></ol></li><li>Else,<ol><li><emu-xref href="#assert"><a href="https://tc39.es/ecma262/#assert">Assert</a></emu-xref>: <var>P</var>.[[Kind]] is <emu-val>"method"</emu-val> or <emu-val>"accessor"</emu-val>.</li><li>If PrivateBrandCheck(<var>rval</var>, <var>privateName</var>) is not an <emu-xref href="#sec-completion-record-specification-type"><a href="https://tc39.es/ecma262/#sec-completion-record-specification-type">abrupt completion</a></emu-xref>, then<ol><li>Return <emu-val>true</emu-val>.</li></ol></li></ol></li><li>Return <emu-val>false</emu-val>.</li></ol></emu-alg>
       </ins>
     </emu-clause>
   </emu-clause>
@@ -1860,13 +1856,11 @@ li.menu-search-result-term:before {
   <emu-clause id="sec-all-private-identifiers-valid">
     <h1><span class="secnum">1.2</span> <a href="https://tc39.es/proposal-class-fields/#sec-all-private-identifiers-valid">Static Semantics: AllPrivateIdentifiersValid</a></h1>
     AllPrivateIdentifiersValid is an abstract operation which takes <var>names</var> as an argument.
-    
     <ins class="block">
       <emu-grammar><emu-production name="RelationalExpression" collapsed="">
-    <emu-nt><a href="#prod-RelationalExpression">RelationalExpression</a></emu-nt><emu-geq>:</emu-geq><emu-rhs a="6c591724"><emu-nt>PrivateIdentifier</emu-nt><emu-t>in</emu-t><emu-nt><a href="https://tc39.github.io/ecma262/#prod-ShiftExpression">ShiftExpression</a></emu-nt></emu-rhs>
+    <emu-nt><a href="#prod-RelationalExpression">RelationalExpression</a></emu-nt><emu-geq>:</emu-geq><emu-rhs a="6c591724"><emu-nt>PrivateIdentifier</emu-nt><emu-t>in</emu-t><emu-nt><a href="https://tc39.es/ecma262/#prod-ShiftExpression">ShiftExpression</a></emu-nt></emu-rhs>
 </emu-production></emu-grammar>
-      <emu-alg><ol><li>If StringValue of <emu-nt>PrivateIdentifier</emu-nt> is in <var>names</var>, return <emu-val>true</emu-val>.</li><li>Return <emu-val>false</emu-val>.
-      </li></ol></emu-alg>
+      <emu-alg><ol><li>If StringValue of <emu-nt>PrivateIdentifier</emu-nt> is in <var>names</var>, return <emu-val>true</emu-val>.</li><li>Return <emu-val>false</emu-val>.</li></ol></emu-alg>
     </ins>
   </emu-clause>
 </emu-clause><emu-annex id="sec-copyright-and-software-license">
