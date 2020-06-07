@@ -45,11 +45,11 @@ contributors: Jordan Harband
           1. Let _privateNameBinding_ be ? ResolveBinding(_privateIdentifier_, _env_).
           1. Let _privateName_ be ? GetValue(_privateNameBinding_).
           1. Assert: _privateName_ is a Private Name.
-          1. If _P_.[[Kind]] is *"field"*,
+          1. If _privateName_.[[Kind]] is *"field"*,
             1. If ! PrivateFieldFind(_privateName_, _rval_) is not ~empty~, then
               1. Return *true*.
           1. Else,
-            1. Assert: _P_.[[Kind]] is *"method"* or *"accessor"*.
+            1. Assert: _privateName_.[[Kind]] is *"method"* or *"accessor"*.
             1. If PrivateBrandCheck(_rval_, _privateName_) is not an abrupt completion, then
               1. Return *true*.
           1. Return *false*.
