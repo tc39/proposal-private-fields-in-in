@@ -9,8 +9,43 @@ stage: 2
 contributors: Jordan Harband
 </pre>
 
+<style>
+#sec-placeholder, [href="#sec-placeholder"] {
+  display: none;
+}
+</style>
+<script>
+  Array.from(document.querySelectorAll('ol.toc li'), function (node) {
+    if (node.querySelector(':scope > [href="#sec-placeholder"]')) {
+      node.style.display = 'none';
+    }
+  });
+</script>
+
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+<emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+
 <emu-clause id="sec-ecmascript-language-expressions">
   <h1>ECMAScript Language: Expressions</h1>
+  ...
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+  <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
   <emu-clause id="sec-relational-operators">
     <h1><a href="https://tc39.es/ecma262/#sec-relational-operators">Relational Operators</a></h1>
     <emu-note>
@@ -32,6 +67,8 @@ contributors: Jordan Harband
       <p>The <sub>[In]</sub> grammar parameter is needed to avoid confusing the `in` operator in a relational expression with the `in` operator in a `for` statement.</p>
     </emu-note>
     ...
+    <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
+    <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
     <emu-clause id="sec-relational-operators-runtime-semantics-evaluation">
       <h1><a href="https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation">Runtime Semantics: Evaluation</a></h1>
       <ins class="block">
@@ -56,17 +93,19 @@ contributors: Jordan Harband
         </emu-alg>
       </ins>
     </emu-clause>
-  </emu-clause>
+    ...
+    <emu-clause id="sec-placeholder"><h1>Placeholder to ensure correct clause numbering</h1></emu-clause>
 
-  <emu-clause id="sec-all-private-identifiers-valid">
-    <h1><a href="https://tc39.es/proposal-class-fields/#sec-all-private-identifiers-valid">Static Semantics: AllPrivateIdentifiersValid</a></h1>
-    AllPrivateIdentifiersValid is an abstract operation which takes _names_ as an argument.
-    <ins class="block">
-      <emu-grammar>RelationalExpression : PrivateIdentifier `in` ShiftExpression</emu-grammar>
-      <emu-alg>
-        1. If StringValue of |PrivateIdentifier| is in _names_, return *true*.
-        1. Return *false*.
-      </emu-alg>
-    </ins>
+    <emu-clause id="sec-all-private-identifiers-valid">
+      <h1><a href="https://tc39.es/proposal-class-fields/#sec-all-private-identifiers-valid">Static Semantics: AllPrivateIdentifiersValid</a></h1>
+      <ins class="block">
+        <p>AllPrivateIdentifiersValid is an abstract operation which takes _names_ as an argument.</p>
+        <emu-grammar>RelationalExpression : PrivateIdentifier `in` ShiftExpression</emu-grammar>
+        <emu-alg>
+          1. If StringValue of |PrivateIdentifier| is in _names_, return *true*.
+          1. Return *false*.
+        </emu-alg>
+      </ins>
+    </emu-clause>
   </emu-clause>
 </emu-clause>
