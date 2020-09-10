@@ -93,3 +93,6 @@ This would require a lookahead restriction for a curly brace (which would mean t
 
 ## Spec
 You can view the spec for the `in` solution rendered as [HTML](http://tc39.es/proposal-private-fields-in-in/).
+
+## Implementations
+ - Babel: https://babeljs.io/docs/en/babel-plugin-proposal-private-property-in-object / https://www.npmjs.com/package/@babel/plugin-proposal-private-property-in-object
