@@ -54,10 +54,10 @@ class C {
 
 What is desired is a simple solution to produce a boolean indicating the presence of a private field, that does not require a `try`/`catch` or exceptions.
 
-## Possible Solutions:
+## Solution:
 
 ### `in`
-The most obvious solution seems to be using the `in` keyword, like so:
+The most obvious solution is using the `in` keyword, like so:
 ```js
 class C {
   #brand;
@@ -73,6 +73,9 @@ class C {
 ```
 
 This has no ASI hazards I am aware of; however, it does have one important tradeoff: it permanently kills any possibility for private field shorthand. Specifically, this is because if `#brand` (in the previous example) is a shorthand for `this.#brand`, then `(#brand) in obj` would have to mean the same as `this.#brand in obj`, which means "is the _value_ of `this.#brand` in `obj`?", not "does `obj` have the private field `#brand`?".
+
+
+## Rejected solutions:
 
 ### `try` statement
 
