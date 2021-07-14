@@ -6,7 +6,7 @@ Spec drafted by [@ljharb](https://github.com/ljharb).
 
 Built on top of https://github.com/tc39/ecma262/pull/1668/ pending Class Fields being stage 4 and merged into the larger spec.
 
-This proposal is currently at stage 3 of the [process](https://tc39.github.io/process-document/).
+This proposal is currently at stage 4 of the [process](https://tc39.github.io/process-document/).
 
 ## Rationale
 Private fields have a built-in ”brand check”, in that if you try to access a private field on an object that does not have it installed, it throws an exception.
